@@ -2,7 +2,7 @@ import styles from './page.module.scss'
 
 import { getVotingResults } from "@/actions/scrapper"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 600
 
 type TableCellProps = { shouldHaveBottomBorder: boolean } & ({
     isHeader: true
