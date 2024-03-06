@@ -1,0 +1,45 @@
+@import '@/app/main';
+
+.container {
+    width: 95%;
+    max-width: 500px;
+    border: 1px solid $greyBlue;
+    @include flexDisplaying($direction: column);
+    .tableCell {
+        @include flexDisplaying();
+        height: 50px;
+        &.bottomBorder {
+            border-bottom: 1px solid $greyBlue;
+        }
+        .boldFont {
+            font-weight: bold;
+        }
+        
+        .numberSection, .votesSection {
+            @include flexDisplaying($align: center, $justify: center);
+            //text-align: left;
+        }
+        .nameSection {
+            padding: 0 15px;
+            @include flexDisplaying($align: center);
+            span {
+                text-align: left;
+                width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+        .numberSection {
+            width: 15%;
+            border-right: 1px solid $greyBlue;
+        }
+        .nameSection {
+            width: 70%;
+            border-right: 1px solid $greyBlue;
+        }
+        .votesSection {
+            width: 15%;
+        }
+    }
+}
