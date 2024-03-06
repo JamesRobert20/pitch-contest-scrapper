@@ -1,5 +1,5 @@
-import { VotingResultType } from '@/types/VotingResult';
-import { Page } from 'puppeteer'
+import { VotingResultType } from "@/types/VotingResult";
+import puppeteer, { Page } from 'puppeteer'
 import * as cheerio from 'cheerio';
 
 export async function scrapePage1(page: Page, pageNumber: number) {
@@ -52,4 +52,19 @@ export async function scrapePage(pageNumber: number) {
     });
 
     return results;
+}
+
+export async function getVotingResults(): Promise<VotingResultType[]> {
+    try {
+        let results: VotingResultType[] = []
+
+        for(let i = 1; i < 9; i++) {
+            results.push(...(await scrapePage(i)));
+        }
+        
+        return results.sort((a, b) => b.votes - a.votes).slice(0, 30)
+    } catch (error: any) {
+        console.error('An error occured:\n', error)
+        return []
+    }
 }

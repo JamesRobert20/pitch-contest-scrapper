@@ -1,6 +1,6 @@
 import styles from './page.module.scss'
 
-import { getVotingResults } from "@/actions/scrapper"
+import { getVotingResults } from "@/lib/scrapper"
 
 export const dynamic = 'force-dynamic'
 
