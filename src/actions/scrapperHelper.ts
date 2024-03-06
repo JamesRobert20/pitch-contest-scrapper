@@ -32,7 +32,9 @@ export async function scrapePage1(page: Page, pageNumber: number) {
 
 export async function scrapePage(pageNumber: number) {
     // Fetch HTML content of the webpage
-    const response = await fetch(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`);
+    const response = await fetch(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`, {
+        next: { revalidate: 600 }
+    });
 
     // Parse HTML content using regex or any other method
     const htmlContent = await response.text();
