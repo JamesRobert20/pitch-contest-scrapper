@@ -1,6 +1,8 @@
+import { VotingResultType } from '@/types/VotingResult';
 import { Page } from 'puppeteer'
+import * as cheerio from 'cheerio';
 
-export async function scrapePage(page: Page, pageNumber: number) {
+export async function scrapePage1(page: Page, pageNumber: number) {
     // Navigate to the webpage
     await page.goto(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`);
     
@@ -26,4 +28,26 @@ export async function scrapePage(page: Page, pageNumber: number) {
     });
 
     return results
+}
+
+export async function scrapePage(pageNumber: number) {
+    // Fetch HTML content of the webpage
+    const response = await fetch(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`);
+
+    // Parse HTML content using regex or any other method
+    const htmlContent = await response.text();
+
+    // Load HTML content into cheerio
+    const $ = cheerio.load(htmlContent);
+
+    // Extract voting results
+    const results: VotingResultType[] = [];
+    $('.gallery-wrap.plussix .one-half.classic.zip.pcmobile').each((index, element) => {
+        const name = $(element).find('.gallery-title-autor .author').text().trim();
+        const votes = parseInt($(element).find('.gallery-votes .pc_visible').text().trim()) || 0;
+
+        results.push({ name, votes });
+    });
+
+    return results;
 }

@@ -9,13 +9,13 @@ export async function getVotingResults(): Promise<VotingResultType[]> {
         let results: VotingResultType[] = []
 
         // Launch headless browser
-        const browser = await puppeteer.launch();
+        //const browser = await puppeteer.launch();
 
         // Create a new page
-        const page = await browser.newPage();
+        //const page = await browser.newPage();
 
         for(let i = 1; i < 9; i++) {
-            results.push(...(await scrapePage(page, i)));
+            results.push(...(await scrapePage(i)));
         }
         
         return results.sort((a, b) => b.votes - a.votes).slice(0, 30)
