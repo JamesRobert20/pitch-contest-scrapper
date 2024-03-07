@@ -32,39 +32,51 @@ export async function scrapePage1(page: Page, pageNumber: number) {
 
 export async function scrapePage(pageNumber: number) {
     // Fetch HTML content of the webpage
-    const response = await fetch(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`, {
+    return fetch(`https://www.blackentrepreneursbc.org/black-pitch-contest-2024-voting-page/page/${pageNumber}`, {
         cache: 'no-store'
-    });
+    })
+    .then(res => res.text())
+    .then(htmlContent => {
+        // Load HTML content into cheerio
+        const $ = cheerio.load(htmlContent);
 
-    // Parse HTML content using regex or any other method
-    const htmlContent = await response.text();
+        // Extract voting results
+        const results: VotingResultType[] = [];
+        $('.gallery-wrap.plussix .one-half.classic.zip.pcmobile').each((index, element) => {
+            const name = $(element).find('.gallery-title-autor .author').text().trim();
+            const votes = parseInt($(element).find('.gallery-votes .pc_visible').text().trim()) || 0;
+            results.push({ name, votes });
+        });
 
-    // Load HTML content into cheerio
-    const $ = cheerio.load(htmlContent);
-
-    // Extract voting results
-    const results: VotingResultType[] = [];
-    $('.gallery-wrap.plussix .one-half.classic.zip.pcmobile').each((index, element) => {
-        const name = $(element).find('.gallery-title-autor .author').text().trim();
-        const votes = parseInt($(element).find('.gallery-votes .pc_visible').text().trim()) || 0;
-
-        results.push({ name, votes });
-    });
-
-    return results;
+        return results;
+    })
+    /* .catch(error => {
+        console.error(`Error occured on page ${pageNumber}:\n`, error)
+        return []
+    }) */
 }
 
 export async function getVotingResults(): Promise<VotingResultType[]> {
+    let results: VotingResultType[] = []
     try {
-        let results: VotingResultType[] = []
+        let timeoutPromise: Promise<VotingResultType[][]> = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request from external website timed out')), 8800);
+        });
 
+        let resultsPromises = [];
         for(let i = 1; i < 9; i++) {
-            results.push(...(await scrapePage(i)));
+            resultsPromises.push(scrapePage(i));
         }
-        
-        return results.sort((a, b) => b.votes - a.votes).slice(0, 30)
+        let fetchPromise = Promise.all(resultsPromises)
+
+        let response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        let allItems = response.reduce((acc, response) => acc.concat(response), []);
+
+        results = allItems.sort((a, b) => b.votes - a.votes).slice(0, 30)
     } catch (error: any) {
         console.error('An error occured:\n', error)
-        return []
+    } finally {
+        return results
     }
 }
