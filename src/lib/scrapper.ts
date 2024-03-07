@@ -59,16 +59,15 @@ export async function scrapePage(pageNumber: number) {
 export async function getVotingResults(): Promise<VotingResultType[]> {
     let results: VotingResultType[] = []
     try {
-        let timeoutPromise: Promise<VotingResultType[][]> = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Request from external website timed out')), 8800);
-        });
-
         let resultsPromises = [];
         for(let i = 1; i < 9; i++) {
             resultsPromises.push(scrapePage(i));
         }
         let fetchPromise = Promise.all(resultsPromises)
 
+        let timeoutPromise: Promise<VotingResultType[][]> = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request from external website timed out')), 8800);
+        });
         let response = await Promise.race([fetchPromise, timeoutPromise]);
 
         let allItems = response.reduce((acc, response) => acc.concat(response), []);
